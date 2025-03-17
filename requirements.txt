@@ -2,4 +2,6 @@ ipykernel
 python-dotenv
 langchain
 langchain_groq
+langchain-community
 transformers
+PyPDF
