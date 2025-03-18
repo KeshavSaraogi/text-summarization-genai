@@ -5,3 +5,9 @@ langchain_groq
 langchain-community
 transformers
 PyPDF
+validators==0.28.1
+youtube_transcript_api
+streamlit
+unstructured
+pytube
+groq
