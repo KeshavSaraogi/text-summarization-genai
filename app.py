@@ -34,19 +34,27 @@ if st.button('Summarize Contents from URL'):
         st.error('Please Enter Valid URL. It should be a Youtube URL or Website URL.')
     else:
         try:
-            with st.spinner('Waiting...'):
-                # Initialize ChatGroq here, when both API key and URL are present
-                llm = ChatGroq(model = 'gemma2-9b-it', groq_api_key=groq_api_key) 
+            with st.spinner('Fetching and summarizing content...'):
+                # Initialize ChatGroq
+                llm = ChatGroq(model='gemma2-9b-it', groq_api_key=groq_api_key)
 
-                if "youtube.com" in inputURL:
-                    loader = YoutubeLoader.from_youtube_url(inputURL, add_video_info = True)
-                else:
-                    loader = UnstructuredURLLoader(urls = [inputURL], ssl_verify = True, headers = allHeaders)
+                # Load website content
+                loader = UnstructuredURLLoader(urls=[inputURL], ssl_verify=True, headers=allHeaders)
 
-                documents = loader.load()
-                chain = load_summarize_chain(llm, chain_type = 'stuff', prompt = prompt)
+                try:
+                    documents = loader.load()
+                except Exception as load_error:
+                    st.error(f"Failed to load webpage content: {load_error}")
+                    st.stop()
+
+                if not documents or len(documents) == 0:
+                    st.error('No content found on the page to summarize.')
+                    st.stop()
+
+                # Summarization chain
+                chain = load_summarize_chain(llm, chain_type='stuff', prompt=prompt)
                 summaryOutput = chain.run(documents)
 
                 st.success(summaryOutput)
         except Exception as e:
-            st.error(f'Exception: {e}')
+            st.error(f'An error occurred: {e}')
